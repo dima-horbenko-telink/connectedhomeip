@@ -42,3 +42,5 @@ inline AppTask & GetAppTask(void)
 {
     return AppTask::sAppTask;
 }
+
+CHIP_ERROR InitDoorLockHandler();

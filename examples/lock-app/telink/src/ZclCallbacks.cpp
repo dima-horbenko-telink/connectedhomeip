@@ -27,6 +27,9 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
 
+
+
+
 using namespace ::chip;
 using namespace ::chip::app::Clusters;
 using namespace ::chip::app::Clusters::DoorLock;
@@ -82,10 +85,11 @@ bool emberAfPluginDoorLockOnDoorLockCommand(EndpointId endpointId, const Nullabl
                                             const Nullable<chip::NodeId> & nodeId, const Optional<ByteSpan> & pinCode,
                                             OperationErrorEnum & err)
 {
+    ChipLogError(Zcl, "$$$$$BoltLockManager::ValidatePIN(10)");
     bool result = BoltLockMgr().ValidatePIN(pinCode, err);
-
+ChipLogError(Zcl, "$$$$$$emberAfPluginDoorLockOnDoorLockCommand %x, %x", result,true);
     /* Handle changing attribute state on command reception */
-    if (result)
+    if (true==result)
     {
         BoltLockMgr().Lock(BoltLockManager::OperationSource::kRemote);
     }
@@ -99,8 +103,30 @@ bool emberAfPluginDoorLockOnDoorUnlockCommand(EndpointId endpointId, const Nulla
 {
     bool result = BoltLockMgr().ValidatePIN(pinCode, err);
 
+    ChipLogError(Zcl, "$$$$$$$$$$emberAfPluginDoorLockOnDoorUnlockCommand %x,%x", result,true);
     /* Handle changing attribute state on command reception */
-    if (result)
+    if (true==result)
+    {
+        BoltLockMgr().Unlock(BoltLockManager::OperationSource::kRemote);
+    }
+
+    // ChipLogProgress(Zcl, "Device App::DoorLock::emberAfPluginDoorLockOnDoorLockCommand");
+    // return DoorLockServer::Instance().SetLockState(endpointId, DlLockState::kLocked);
+
+
+    return result;
+}
+
+
+bool emberAfPluginDoorLockOnDoorUnboltCommand(chip::EndpointId endpointId, const Nullable<chip::FabricIndex> & fabricIdx,
+                                              const Nullable<chip::NodeId> & nodeId, const Optional<ByteSpan> & pinCode,
+                                              OperationErrorEnum & err)
+{
+    bool result = BoltLockMgr().ValidatePIN(pinCode, err);
+
+    ChipLogError(Zcl, "$$$$$$$$$$emberAfPluginDoorLockOnDoorUnlockCommand %x,%x", result,true);
+    /* Handle changing attribute state on command reception */
+    if (true==result)
     {
         BoltLockMgr().Unlock(BoltLockManager::OperationSource::kRemote);
     }
@@ -110,6 +136,7 @@ bool emberAfPluginDoorLockOnDoorUnlockCommand(EndpointId endpointId, const Nulla
 
 void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
 {
+    ChipLogError(Zcl, "$$$$$$$$$$emberAfDoorLockClusterInitCallback %x", endpoint);
     DoorLockServer::Instance().InitServer(endpoint);
 
     const auto logOnFailure = [](EmberAfStatus status, const char * attributeName) {
@@ -128,7 +155,15 @@ void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
 
     // Set FeatureMap to (kUser|kPinCredential), default is:
     // (kUser|kAccessSchedules|kRfidCredential|kPinCredential) 0x113
-    logOnFailure(DoorLock::Attributes::FeatureMap::Set(endpoint, 0x101), "feature map");
+    // logOnFailure(DoorLock::Attributes::FeatureMap::Set(endpoint, 0x101), "feature map");
 
     GetAppTask().UpdateClusterState(BoltLockMgr().GetState(), BoltLockManager::OperationSource::kUnspecified);
+}
+
+
+DlStatus emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
+                                          DlScheduleStatus status, DaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute,
+                                          uint8_t endHour, uint8_t endMinute)
+{
+    return DlStatus::kSuccess;
 }

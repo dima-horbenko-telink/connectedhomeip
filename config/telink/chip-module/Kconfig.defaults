@@ -178,7 +178,7 @@ config NVS_LOOKUP_CACHE
     default y
 
 config NVS_LOOKUP_CACHE_SIZE
-    default 2048 if !PM
+    default 512 if !PM
 
 # Set multiplicator of Name Value Storage (NVS) as 1 to reach NVS sector size 4KB
 # nvs_sector_size = flash_page_size * mult = 4KB * 1 = 4KB
